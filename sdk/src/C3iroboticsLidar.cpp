@@ -14,7 +14,10 @@ History:
 
 /********************************* File includes **********************************/
 #include "C3iroboticsLidar.h"
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
+#include "C3iroboticsLidar.h"
 /******************************* Current libs includes ****************************/
 #include <iostream>
 
@@ -388,5 +391,36 @@ void C3iroboticsLidar::resetScanGrab()
     m_grab_scan_count = 0;
     m_last_scan_angle = 0.0;
     m_remainder_flag = false;;
+}
+
+
+/*
+ * module: pybind11_example
+ * m: name of module object
+ */
+PYBIND11_MODULE(pybind11_example, m) {
+    m.doc() = "pybind11 example plugin"; // Optional module docstring
+    // exported name of function
+    // address of function
+    // description
+    m.def("C3iroboticsLidar", &C3iroboticsLidar, "A function that constructs a C3iroboticsLidar object");
+    py::class_<TLidarScan>(m, "TLidarScan")
+            .def(py.init<>())
+            .def("insert", &TLidarScan::insert)
+            .def("clear", &TLidarScan::clear)
+            .def("getSize", &TLidarScan::getSize)
+            ;
+    py::class_<C3iroboticsLidar>(m, "C3iroboticsLidar")
+            .def(py.init<>())
+            .def("initilize", &C3iroboticsLidar::initialize)
+            .def("getScanData" &C3iroboticsLidar::getScanData)
+            .def("getLidarError" &C3iroboticsLidar::getLidarError)
+            .def("getLidarScan" &C3iroboticsLidar::getLidarScan)
+            .def("setDataWithSignal" &C3iroboticsLidar::setDataWithSignal)
+            .def("isReceiveLidarSpeed" &C3iroboticsLidar::isReceiveLidarSpeed)
+            .def("getLidarCurrentSpeed" &C3iroboticsLidar::getLidarCurrentSpeed)
+            .def("enableLogWhenReceiveTimeOvers" &C3iroboticsLidar::enableLogWhenReceiveTimeOvers)
+            ;
+
 }
 
