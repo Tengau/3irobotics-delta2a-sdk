@@ -399,28 +399,52 @@ void C3iroboticsLidar::resetScanGrab()
  * m: name of module object
  */
 PYBIND11_MODULE(pybind11_example, m) {
-    m.doc() = "pybind11 example plugin"; // Optional module docstring
+    m.doc() = "pybind11 plugin for C3iroboticsLidar file"; // Optional module docstring
     // exported name of function
     // address of function
     // description
     m.def("C3iroboticsLidar", &C3iroboticsLidar, "A function that constructs a C3iroboticsLidar object");
+    // struct TLidarScan
     py::class_<TLidarScan>(m, "TLidarScan")
             .def(py.init<>())
             .def("insert", &TLidarScan::insert)
             .def("clear", &TLidarScan::clear)
             .def("getSize", &TLidarScan::getSize)
             ;
-    py::class_<C3iroboticsLidar>(m, "C3iroboticsLidar")
+    // unscoped enum TLidarGrabResult
+    py::enum_<TLidarGrabResult>(m, "TLidarGrabResult")
+	    .value("LIDAR_GRAB_ING", LIDAR_GRAB_ING)
+	    .value("LIDAR_GRAB_SUCESS", LIDAR_GRAB_SUCESS)
+	    .value("LIDAR_GRAB_ERRO", LIDAR_GRAB_ERRO)
+	    .value("LIDAR_GRAB_ELSE", LIDAR_GRAB_ELSE)
+	    .export_values();
+    // inscoped enum TLidarCommandID
+    py::enum_<TLidarCommandID>(m, "TLidarCommandID")
+	    .value("I3LIDAR_DISTANCE", I3LIDAR_DISTANCE)
+	    .value("I3LIDAR_HEALTH", I3LIDAR_HEALTH)
+	    .value("I3LIDAR_LIDAR_SPEED", I3LIDAR_SPEED)
+	    .value("I3LIDAR_NEW_DISTANCE", I3LIDAR_NEW_DISTANCE)
+	    .export_values();
+    // C3iroboticsLidar instance so the enum can be nested:
+    py::class_<C3iroboticsLidar> lidar(m, "Lidar");
+    // nested enum TGrabScanState
+    py::enum_<C3iroboticsLidar::TGrabScanState>(lidar, "TGrabScanState")
+	    .value("GRAB_SCAN_FIRST", C3iroboticsLidar::TGrabScanState::GRAB_SCAN_FIRST)
+	    .value("GRAB_SCAN_ELSE_DATA", C3iroboticsLidar::TGrabScanState::GRAB_SCAN_FIRST)
+    // struct C3iroboticsLidar
+    py::class_<C3iroboticsLidar>(lidar, "C3iroboticsLidar")
             .def(py.init<>())
             .def("initilize", &C3iroboticsLidar::initialize)
             .def("getScanData" &C3iroboticsLidar::getScanData)
             .def("getLidarError" &C3iroboticsLidar::getLidarError)
-            .def("getLidarScan" &C3iroboticsLidar::getLidarScan)
+	    // return a reference
+            .def("getLidarScan" &C3iroboticsLidar::getLidarScan, py::return_value_policy::reference)
             .def("setDataWithSignal" &C3iroboticsLidar::setDataWithSignal)
             .def("isReceiveLidarSpeed" &C3iroboticsLidar::isReceiveLidarSpeed)
             .def("getLidarCurrentSpeed" &C3iroboticsLidar::getLidarCurrentSpeed)
             .def("enableLogWhenReceiveTimeOvers" &C3iroboticsLidar::enableLogWhenReceiveTimeOvers)
             ;
+
 
 }
 

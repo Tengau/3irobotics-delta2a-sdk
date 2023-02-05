@@ -72,9 +72,9 @@ namespace everest
             I3LIDAR_LIDAR_SPEED  = 0xAE,
             I3LIDAR_NEW_DISTANCE = 0xAD
         };
-
-		class C3iroboticsLidar
-		{
+        
+        class C3iroboticsLidar
+        {
             public:
                 enum TGrabScanState
                 {
